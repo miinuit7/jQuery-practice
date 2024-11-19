@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,18 +10,18 @@
   <link rel="stylesheet" href="./css/style.css">
   <title>Document</title>
 </head>
+
 <body>
   <div class="wrapper" id="wrapper">
     <button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
   </div>
   <script src="../../common/js/jquery.js"></script>
   <script>
-   $(document).ready(function() {
+    $(document).ready(function () {
       const failHtml = `
         <p class="text">逃げられてしまった...</p>
         <button class="btn mt" data-js="reset">戻る</button>
       `;
-
       const encountHtml = `
         <p class="name"></p>
         <div>
@@ -31,7 +32,6 @@
           <button class="btn" data-js="reset">逃げる</button>
         </div>
       `;
-
       const doneHtml = `
         <p class="name">ゲットしました</p>
         <div>
@@ -39,20 +39,24 @@
         </div>
         <button class="btn" data-js="reset">戻る</button>
       `;
-
       const initialHtml = `
         <button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
       `;
 
       const getRandomPokemonId = () => Math.floor(Math.random() * 151) + 1;
 
+      function calculateCatchSuccess() {
+        const BASE_CATCH_RATE = 0.5; 
+        return Math.random() < BASE_CATCH_RATE;
+      }
+
       function encounterPokemon() {
         const pokemonId = getRandomPokemonId();
-        
+
         $.ajax({
           url: `https://pokeapi.co/api/v2/pokemon/${pokemonId}`,
           method: 'GET',
-          success: function(data) {
+          success: function (data) {
             $('#wrapper').html(encountHtml);
             $('.name').text(data.name);
             $('.img').attr({
@@ -60,27 +64,27 @@
               'alt': data.name
             });
           },
-          error: function(xhr, status, error) {
+          error: function (xhr, status, error) {
             console.error('Error fetching Pokemon:', error);
           }
         });
       }
 
       function catchPokemon() {
-        const success = Math.random() >= 0.5;
-        
+        const success = calculateCatchSuccess(); // 新しい関数を使用
+
         if (success) {
           $.ajax({
             url: 'https://pokeapi.co/api/v2/item/4',
             method: 'GET',
-            success: function(data) {
+            success: function (data) {
               $('#wrapper').html(doneHtml);
               $('.img').attr({
                 'src': data.sprites.default,
                 'alt': 'Pokeball'
               });
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
               console.error('Error fetching Pokeball:', error);
             }
           });
@@ -96,7 +100,8 @@
       $(document).on('click', '#pokemon_search', encounterPokemon);
       $(document).on('click', '#catch', catchPokemon);
       $(document).on('click', '[data-js="reset"]', resetGame);
-    });ï
+    });
   </script>
 </body>
+
 </html>
